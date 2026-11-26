@@ -278,13 +278,21 @@ def test_moderation_self_conflicts(client):
 @pytest.mark.parametrize(
     "value",
     [
-        "javascript:alert(1)",
-        "https://t.me.evil.test/chat",
-        "http://t.me/chat",
-        "https://t.me@evil.test/chat",
+        "team@example.com\nТелефон: +7 (000) 000-00-00",
+        "https://example.org/team",
+        "Подойти в аудиторию после занятия",
+        "https://t.me/test_team",
     ],
 )
-def test_contact_url_validation(client, value):
+def test_contact_formats(client, value):
+    owner = account(client)
+    response = client.post("/projects", headers=owner, json={**payload(), "team_contact": value})
+    assert response.status_code == 201
+    assert response.json()["team_contact"] == value
+
+
+@pytest.mark.parametrize("value", ["x" * 501, "contact\x00text"])
+def test_invalid_contact_text(client, value):
     owner = account(client)
     assert (
         client.post(

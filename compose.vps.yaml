@@ -1,6 +1,8 @@
 name: mai-team-vps
 
 services:
+  migrate:
+    env_file: .env.vps.demo
   db:
     ports: !reset []
     restart: unless-stopped

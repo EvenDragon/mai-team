@@ -11,6 +11,7 @@ import {
   ReportForm,
   Resource,
   Skills,
+  TeamContact,
 } from "../components/ui";
 
 function ApplyForm({ vacancy, onDone }) {
@@ -259,14 +260,7 @@ export default function Project() {
                     </p>
                   )}
                   {p.team_contact ? (
-                    <a
-                      className="button full"
-                      href={p.team_contact}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Связаться в Telegram ↗
-                    </a>
+                    <TeamContact value={p.team_contact} />
                   ) : (
                     <p className="small muted">
                       {owner || member

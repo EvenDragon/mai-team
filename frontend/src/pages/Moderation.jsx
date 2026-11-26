@@ -1,7 +1,7 @@
 import { Link, useSearchParams } from "react-router-dom";
 import { labels, post } from "../api";
 import { useAction, useResource } from "../hooks";
-import { Badge, Empty, Feedback, PageHead, Resource } from "../components/ui";
+import { Badge, Empty, Feedback, PageHead, Resource, TeamContact } from "../components/ui";
 
 function Review({ item, type, onDone }) {
   const action = useAction();
@@ -66,15 +66,7 @@ function Review({ item, type, onDone }) {
               {v.requirements}
             </p>
           ))}
-          {item.team_contact && (
-            <a
-              href={item.team_contact}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Проверить контакт ↗
-            </a>
-          )}
+          {item.team_contact && <TeamContact value={item.team_contact} />}
         </>
       )}
       <Feedback {...action} />

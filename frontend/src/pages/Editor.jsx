@@ -217,17 +217,16 @@ function EditorForm({ project }) {
             <span className="step">03</span> Как связаться
           </h2>
           <label>
-            Telegram команды или автора
-            <input
+            Контакты
+            <textarea
               name="team_contact"
-              type="url"
+              rows={3}
               defaultValue={project?.team_contact}
               maxLength={500}
               required
-              pattern="https://t\.me/.+"
-              placeholder="https://t.me/…"
+              placeholder="Email, телефон, ссылка или другой способ связи"
             />
-            <small>Ссылку увидят только принятые участники и модераторы.</small>
+            <small>Контакты видны автору, принятым участникам и модераторам.</small>
           </label>
         </section>
         <div className="notice">

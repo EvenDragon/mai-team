@@ -48,15 +48,9 @@ class ProjectInput(Input):
 
     @field_validator("team_contact")
     @classmethod
-    def safe_contact(cls, value):
-        from urllib.parse import urlparse
-
-        if value:
-            url = urlparse(value)
-            if url.scheme != "https" or url.netloc != "t.me" or not url.path.strip("/"):
-                raise ValueError(
-                    "Укажите ссылку https://t.me/ на чат команды или автора"
-                )
+    def valid_contact_text(cls, value):
+        if "\x00" in value:
+            raise ValueError("Контакты содержат недопустимый символ")
         return value
 
 

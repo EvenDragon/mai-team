@@ -193,3 +193,19 @@ export function ReportForm({ targetType, targetId }) {
     </form>
   );
 }
+
+export function TeamContact({ value }) {
+  return (
+    <div className="pre-wrap">
+      <strong>Контакты</strong>
+      <br />
+      {/^https?:\/\/[^\s]+$/i.test(value) ? (
+        <a href={value} target="_blank" rel="noopener noreferrer">
+          {value}
+        </a>
+      ) : (
+        value
+      )}
+    </div>
+  );
+}

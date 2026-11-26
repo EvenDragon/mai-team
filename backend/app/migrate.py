@@ -18,7 +18,12 @@ def migrate():
             db.execute(
                 "CREATE TABLE IF NOT EXISTS schema_migrations (version text PRIMARY KEY, checksum text NOT NULL)"
             )
-            for path in sorted((ROOT / "migrations").glob("*.sql")):
+            paths = sorted((ROOT / "migrations").glob("*.sql"))
+            demo_path = ROOT / "seeds" / "vps_demo_001.sql"
+            demo_password = os.getenv("VPS_DEMO_PASSWORD")
+            if demo_password:
+                paths.append(demo_path)
+            for path in paths:
                 sql = path.read_text(encoding="utf-8-sig")
                 digest = hashlib.sha256(sql.encode()).hexdigest()
                 previous = db.execute(
@@ -29,6 +34,13 @@ def migrate():
                     if previous[0] != digest:
                         raise RuntimeError(f"Migration modified: {path.name}")
                     continue
+                if path == demo_path:
+                    from .security import hash_password
+
+                    db.execute(
+                        "SELECT set_config('mai.demo_password_hash', %s, false)",
+                        (hash_password(demo_password),),
+                    )
                 # Migration SQL owns its BEGIN/COMMIT. Add bookkeeping into same transaction.
                 sql = sql.rsplit("COMMIT;", 1)[0]
                 db.execute(sql)
