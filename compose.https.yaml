@@ -4,7 +4,7 @@ services:
   https:
     image: caddy:2-alpine
     environment:
-      VPS_PUBLIC_IPV4: ${VPS_PUBLIC_IPV4:?Set VPS_PUBLIC_IPV4 in .env.https}
+      VPS_PUBLIC_IPV4: ${VPS_PUBLIC_IPV4:?Set VPS_PUBLIC_IPV4 in .env}
     ports:
       - "0.0.0.0:80:80"
       - "0.0.0.0:443:443"

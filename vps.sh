@@ -7,13 +7,23 @@ if [ ! -f .env ]; then
     exit 1
 fi
 
-compose() {
+base_compose() {
+    set -- --env-file .env -f compose.yaml -f compose.vps.yaml "$@"
     if [ -f .env.https ]; then
-        set -- -f compose.https.yaml "$@"
-        docker compose --env-file .env --env-file .env.https -f compose.yaml -f compose.vps.yaml "$@"
-    else
-        docker compose --env-file .env -f compose.yaml -f compose.vps.yaml "$@"
+        set -- --env-file .env.https "$@"
     fi
+    docker compose "$@"
+}
+
+# Let Compose resolve quoting, interpolation and env-file precedence.
+service=$(base_compose config --environment | awk '
+    /^VPS_PUBLIC_IPV4=./ { https = 1 }
+    END { print (https ? "https" : "frontend") }
+')
+
+compose() {
+    if [ "$service" = https ]; then set -- -f compose.https.yaml "$@"; fi
+    base_compose "$@"
 }
 
 case "${1:-}" in
@@ -37,8 +47,6 @@ case "${1:-}" in
                     psql -Xw -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "\password"
             '
         fi
-        service=frontend
-        if [ -f .env.https ]; then service=https; fi
         compose up --build -d --wait "$service"
         ;;
     *) compose "$@" ;;
