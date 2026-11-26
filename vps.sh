@@ -8,7 +8,12 @@ if [ ! -f .env ]; then
 fi
 
 compose() {
-    docker compose --env-file .env -f compose.yaml -f compose.vps.yaml "$@"
+    if [ -f .env.https ]; then
+        set -- -f compose.https.yaml "$@"
+        docker compose --env-file .env --env-file .env.https -f compose.yaml -f compose.vps.yaml "$@"
+    else
+        docker compose --env-file .env -f compose.yaml -f compose.vps.yaml "$@"
+    fi
 }
 
 case "${1:-}" in
@@ -32,7 +37,9 @@ case "${1:-}" in
                     psql -Xw -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "\password"
             '
         fi
-        compose up --build -d --wait frontend
+        service=frontend
+        if [ -f .env.https ]; then service=https; fi
+        compose up --build -d --wait "$service"
         ;;
     *) compose "$@" ;;
 esac

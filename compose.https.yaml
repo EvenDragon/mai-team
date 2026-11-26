@@ -1,0 +1,22 @@
+services:
+  frontend:
+    ports: !reset []
+  https:
+    image: caddy:2-alpine
+    environment:
+      VPS_PUBLIC_IPV4: ${VPS_PUBLIC_IPV4:?Set VPS_PUBLIC_IPV4 in .env.https}
+    ports:
+      - "0.0.0.0:80:80"
+      - "0.0.0.0:443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+    depends_on:
+      frontend:
+        condition: service_healthy
+
+volumes:
+  caddy_data:
+  caddy_config:
