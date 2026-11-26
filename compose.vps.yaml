@@ -1,0 +1,27 @@
+name: mai-team-vps
+
+services:
+  db:
+    ports: !reset []
+    restart: unless-stopped
+  backend:
+    ports: !reset []
+    restart: unless-stopped
+    environment:
+      # nginx replaces the forwarding header and the API has no published port.
+      FORWARDED_ALLOW_IPS: "*"
+      CORS_ORIGINS: ""
+  frontend:
+    ports: !override
+      - "${VPS_BIND_IP:-0.0.0.0}:${VPS_PORT:-80}:8080"
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+        restart: true
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/api/health"]
+      interval: 10s
+      timeout: 4s
+      retries: 12
+      start_period: 5s

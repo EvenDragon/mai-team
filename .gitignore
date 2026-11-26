@@ -5,6 +5,7 @@ __pycache__
 .pytest_cache
 .env
 .env.local
+.env.vps*
 *.db
 *.pyc
 *.log

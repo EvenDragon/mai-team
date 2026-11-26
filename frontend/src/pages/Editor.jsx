@@ -5,11 +5,12 @@ import { useAuth } from "../auth";
 import { useAction, useResource } from "../hooks";
 import { Feedback, PageHead, Resource } from "../components/ui";
 
+let nextRoleKey = 0;
 const emptyRole = () => ({
   title: "",
   requirements: "",
   capacity: 1,
-  key: crypto.randomUUID(),
+  key: `draft-${++nextRoleKey}`,
 });
 function EditorForm({ project }) {
   const [roles, setRoles] = useState(
