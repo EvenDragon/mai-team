@@ -21,8 +21,10 @@ def migrate():
             paths = sorted((ROOT / "migrations").glob("*.sql"))
             demo_path = ROOT / "seeds" / "vps_demo_001.sql"
             demo_password = os.getenv("VPS_DEMO_PASSWORD")
-            if demo_password:
+            if os.getenv("VPS_DEMO_ENABLED") == "true" or demo_password:
                 paths.append(demo_path)
+            if demo_password and not 10 <= len(demo_password) <= 128:
+                raise ValueError("VPS_DEMO_PASSWORD в .env должен содержать от 10 до 128 символов")
             for path in paths:
                 sql = path.read_text(encoding="utf-8-sig")
                 digest = hashlib.sha256(sql.encode()).hexdigest()
@@ -39,7 +41,7 @@ def migrate():
 
                     db.execute(
                         "SELECT set_config('mai.demo_password_hash', %s, false)",
-                        (hash_password(demo_password),),
+                        (hash_password(demo_password) if demo_password else "!vps-demo",),
                     )
                 # Migration SQL owns its BEGIN/COMMIT. Add bookkeeping into same transaction.
                 sql = sql.rsplit("COMMIT;", 1)[0]
@@ -49,6 +51,16 @@ def migrate():
                 )
                 db.execute("COMMIT")
                 print(f"Applied {path.name}")
+            # Activate only demo profiles originally created without a password.
+            if demo_password and db.execute(
+                "SELECT 1 FROM users WHERE password_hash = '!vps-demo' LIMIT 1"
+            ).fetchone():
+                from .security import hash_password
+
+                db.execute(
+                    "UPDATE users SET password_hash = %s WHERE password_hash = '!vps-demo'",
+                    (hash_password(demo_password),),
+                )
         finally:
             db.execute("SELECT pg_advisory_unlock(5152026)")
 

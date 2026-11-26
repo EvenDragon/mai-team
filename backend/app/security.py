@@ -21,6 +21,8 @@ def hash_password(password):
 
 
 def verify_password(password, stored):
+    if stored == "!vps-demo":
+        return False
     _, salt, expected = stored.split("$")
     actual = hashlib.scrypt(
         password.encode(), salt=bytes.fromhex(salt), n=16384, r=8, p=1

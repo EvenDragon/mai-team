@@ -36,4 +36,4 @@ docker compose --profile test run --rm test
 
 ## Состояние
 
-При развёртывании пароль PostgreSQL создаётся на сервере и хранится в файле `.env.vps`, который исключён из Git.
+VPS читает пароль PostgreSQL из `POSTGRES_PASSWORD` в файле `.env`. Для выдачи прав модератора зарегистрированному пользователю выполните на сервере `sudo sh vps.sh moderator user@example.com`.
