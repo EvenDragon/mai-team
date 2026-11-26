@@ -4,13 +4,15 @@ from concurrent.futures import ThreadPoolExecutor
 import pytest
 from sqlalchemy import select
 from conftest import account, published, payload
-from app.models import Session
+from app.models import Session, User
 
 
 def test_registration_profile_logout(client):
     h = account(client)
     me = client.get("/me", headers=h).json()
     assert me["role"] == "student"
+    with client.factory() as db:
+        assert db.get(User, me["id"]).terms_accepted_at is not None
     data = {
         "name": "Участник команды",
         "bio": "Интересуюсь проектами",
@@ -33,9 +35,8 @@ def test_login_and_duplicate(client):
         client.post("/auth/login", json={**d, "password": "WrongPassword!"}).status_code
         == 401
     )
-    assert (
-        client.post("/auth/register", json={**d, "name": "Другой"}).status_code == 409
-    )
+    duplicate = {**d, "name": "Другой", "accepted_terms": True}
+    assert client.post("/auth/register", json=duplicate).status_code == 409
 
 
 @pytest.mark.parametrize(
@@ -52,7 +53,18 @@ def test_login_and_duplicate(client):
     ],
 )
 def test_registration_validation(client, data):
-    assert client.post("/auth/register", json=data).status_code == 422
+    assert client.post("/auth/register", json={**data, "accepted_terms": True}).status_code == 422
+
+
+@pytest.mark.parametrize(
+    "consent",
+    [{}, {"accepted_terms": False}, {"accepted_terms": "true"}, {"accepted_terms": 1}],
+)
+def test_registration_requires_explicit_consent(client, consent):
+    data = {"email": "new@example.com", "name": "Student", "password": "TestPassword2026!"}
+    assert client.post("/auth/register", json={**data, **consent}).status_code == 422
+    with client.factory() as db:
+        assert db.scalar(select(User)) is None
 
 
 def test_session_expiry(client):

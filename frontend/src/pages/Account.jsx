@@ -21,7 +21,9 @@ export function AuthPage({ register = false }) {
     const data = {
       email: f.get("email"),
       password: f.get("password"),
-      ...(register ? { name: f.get("name") } : {}),
+      ...(register
+        ? { name: f.get("name"), accepted_terms: f.has("accepted_terms") }
+        : {}),
     };
     action.run(async () => {
       const result = await post(
@@ -92,10 +94,15 @@ export function AuthPage({ register = false }) {
           <small>От 10 символов</small>
         </label>
         {register && (
-          <p className="small muted">
-            Используй уважительное общение и правдивое описание проектов.{" "}
-            <Link to="/rules">Правила сообщества</Link>
-          </p>
+          <label className="checkbox">
+            <input type="checkbox" name="accepted_terms" required />
+            <span>
+              Я принимаю{" "}
+              <Link to="/rules" target="_blank" rel="noopener noreferrer">
+                пользовательское соглашение
+              </Link>
+            </span>
+          </label>
         )}
         <button className="button full" disabled={action.busy}>
           {action.busy ? "Подождите…" : register ? "Создать аккаунт" : "Войти"}

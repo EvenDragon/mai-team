@@ -54,4 +54,5 @@ def test_upgrade_preserves_legacy_team(monkeypatch):
         assert db.execute(
             "SELECT user_id,status FROM applications WHERE id=1"
         ).fetchone() == (2, "accepted")
-        assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (2,)
+        assert db.execute("SELECT terms_accepted_at FROM users WHERE id=1").fetchone() == (None,)
+        assert db.execute("SELECT count(*) FROM schema_migrations").fetchone() == (3,)

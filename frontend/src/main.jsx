@@ -44,7 +44,7 @@ class ErrorBoundary extends React.Component {
 function Rules() {
   return (
     <div className="narrow">
-      <PageHead eyebrow="ПРОСТЫЕ ДОГОВОРЁННОСТИ" title="Правила сообщества" />
+      <PageHead eyebrow="ПРАВИЛА СООБЩЕСТВА" title="Пользовательское соглашение" />
       <div className="panel prose">
         <h2>Понятные проекты</h2>
         <p>
@@ -225,7 +225,7 @@ function Shell() {
             <br />
             «Обучение служением»
           </p>
-          <Link to="/rules">Правила сообщества ↗</Link>
+          <Link to="/rules">Пользовательское соглашение ↗</Link>
         </div>
       </footer>
     </>

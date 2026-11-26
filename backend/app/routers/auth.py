@@ -1,4 +1,5 @@
 import json
+import time
 from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DB
@@ -25,7 +26,12 @@ def register(data: Register, request: Request, db: DB = Depends(get_db)):
     email = str(data.email).lower()
     if db.scalar(select(User).where(User.email == email)):
         raise HTTPException(409, "Аккаунт с таким email уже существует")
-    u = User(email=email, name=data.name, password_hash=hash_password(data.password))
+    u = User(
+        email=email,
+        name=data.name,
+        password_hash=hash_password(data.password),
+        terms_accepted_at=int(time.time()),
+    )
     db.add(u)
     db.flush()
     return issue_session(db, u)

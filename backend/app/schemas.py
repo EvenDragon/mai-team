@@ -13,6 +13,14 @@ class Login(Input):
 
 class Register(Login):
     name: str = Field(min_length=2, max_length=100)
+    accepted_terms: Literal[True]
+
+    @field_validator("accepted_terms", mode="before")
+    @classmethod
+    def require_agreement(cls, value):
+        if value is not True:
+            raise ValueError("Для регистрации примите пользовательское соглашение")
+        return value
 
 
 class Profile(Input):

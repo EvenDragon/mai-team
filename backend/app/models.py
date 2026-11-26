@@ -2,6 +2,7 @@ from sqlalchemy import (
     String,
     Text,
     Integer,
+    BigInteger,
     ForeignKey,
     UniqueConstraint,
     CheckConstraint,
@@ -15,6 +16,7 @@ class User(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(254), unique=True)
     password_hash: Mapped[str] = mapped_column(Text)
+    terms_accepted_at: Mapped[int | None] = mapped_column(BigInteger)
     name: Mapped[str] = mapped_column(String(100))
     bio: Mapped[str] = mapped_column(Text, default="")
     institute: Mapped[str] = mapped_column(String(100), default="")

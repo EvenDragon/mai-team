@@ -65,6 +65,7 @@ def account(c, email="owner@example.com", role="student"):
         "/auth/register",
         json={
             "name": "Тестовый пользователь",
+            "accepted_terms": True,
             "email": email,
             "password": "TestPassword2026!",
         },
